@@ -22,8 +22,8 @@ API REST para integração com WhatsApp Web via [whatsapp-web.js](https://github
 ## Instalação
 
 ```bash
-git clone https://github.com/seu-usuario/whatsappjsapi.git
-cd whatsappjsapi
+git clone https://github.com/vikatrod/whatsapp-js-api-painel.git
+cd whatsapp-js-api-painel
 npm install
 ```
 
@@ -142,7 +142,7 @@ O painel oferece:
 
 ```
 whatsappjsapi/
-├── .env                    # Variáveis de ambiente (NÃO commitar)
+├── .env                    # Variáveis de ambiente
 ├── .gitignore
 ├── package.json
 ├── index.js                # Backend (Express + WhatsApp Client)
@@ -153,7 +153,7 @@ whatsappjsapi/
 │   │   └── style.css       # Estilos (dark theme)
 │   └── js/
 │       └── app.js          # Frontend JavaScript
-└── .wwebjs_auth/           # Sessão salva (gerado automaticamente, NÃO commitar)
+└── .wwebjs_auth/           # Sessão salva
 ```
 
 ## Solução de Problemas
