@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - WhatsApp Bot Manager</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo">📱</div>
+        <h1>WhatsApp Bot Manager</h1>
+        <p>Painel de gerenciamento</p>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="username">Usuário</label>
+          <input type="text" id="username" name="username" required placeholder="Digite seu usuário">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input type="password" id="password" name="password" required placeholder="Digite sua senha">
+        </div>
+
+        <div id="loginError" class="error-message" style="display: none;"></div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <span class="btn-text">Entrar</span>
+          <span class="spinner" style="display: none;">⏳</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = '';
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn = e.target.querySelector('button[type="submit"]');
+      const btnText = btn.querySelector('.btn-text');
+      const spinner = btn.querySelector('.spinner');
+      const errorDiv = document.getElementById('loginError');
+
+      btn.disabled = true;
+      btnText.style.display = 'none';
+      spinner.style.display = 'inline';
+      errorDiv.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Falha no login');
+        }
+
+        localStorage.setItem('wajwt', data.token);
+        window.location.href = '/';
+      } catch (err) {
+        errorDiv.textContent = err.message;
+        errorDiv.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        spinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
