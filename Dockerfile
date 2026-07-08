@@ -1,7 +1,7 @@
 FROM node:20-slim
 
 # Install dependencies required by Puppeteer's bundled Chromium
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get install -y --no-install-recommends \
     libnss3 \
     libnspr4 \
     libatk1.0-0 \
@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcairo2 \
     libasound2 \
     libxshmfence1 \
+    libxfixes3 \
     libxss1 \
     fonts-ipafont-gothic \
     fonts-wqy-zenhei \
