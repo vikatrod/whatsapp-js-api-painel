@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const rateLimit = require('express-rate-limit');
+const { ipKeyGenerator } = rateLimit;
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const QRCode = require('qrcode');
@@ -15,6 +17,31 @@ const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
 const JWT_SECRET = process.env.JWT_SECRET || 'whatsapp-admin-secret-change-me';
 const PORT = process.env.PORT || 3000;
+
+// ── Rate Limiters ────────────────────────────────────────────
+const publicMsgLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minuto
+  max: Number(process.env.RATE_LIMIT_PUBLIC) || 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Muitas requisições. Tente novamente em alguns segundos.',
+    retryAfter: '60s'
+  },
+  keyGenerator: ipKeyGenerator,
+});
+
+const authMsgLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minuto
+  max: Number(process.env.RATE_LIMIT_AUTH) || 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Muitas requisições. Tente novamente em alguns segundos.',
+    retryAfter: '60s'
+  },
+  keyGenerator: ipKeyGenerator,
+});
 
 /* =========================
    WhatsApp Client
@@ -219,7 +246,7 @@ registerRoute('post', '/api/auth/login', async (req, res) => {
 });
 
 // Enviar mensagem (público - mantém compatibilidade)
-registerRoute('all', '/enviar-mensagem', async (req, res) => {
+registerRoute('all', '/enviar-mensagem', publicMsgLimiter, async (req, res) => {
   if (!isReady) {
     const ok = await waitUntilConnected(10000);
     if (!ok) return res.status(503).send('WhatsApp inicializando');
@@ -395,7 +422,7 @@ registerRoute('post', '/api/admin/restart-service', requireAuth, async (_, res) 
 });
 
 // Teste de envio de mensagem
-registerRoute('post', '/api/admin/test-send', requireAuth, async (req, res) => {
+registerRoute('post', '/api/admin/test-send', authMsgLimiter, requireAuth, async (req, res) => {
   if (!isReady) {
     const ok = await waitUntilConnected(10000);
     if (!ok) return res.status(503).json({ error: 'WhatsApp não está conectado' });
