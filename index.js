@@ -22,7 +22,14 @@ const PORT = process.env.PORT || 3000;
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--headless=new',
+      '--disable-software-rasterizer',
+    ]
   }
 });
 

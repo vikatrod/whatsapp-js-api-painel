@@ -1,14 +1,7 @@
 FROM node:20-slim
 
-# Install Chromium and ALL required dependencies for headless Chrome in Docker
+# Install dependencies required by Puppeteer's bundled Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    chromium \
-    fonts-ipafont-gothic \
-    fonts-wqy-zenhei \
-    fonts-thai-tlwg \
-    fonts-kacst \
-    fonts-freefont-ttf \
-    libxss1 \
     libnss3 \
     libnspr4 \
     libatk1.0-0 \
@@ -24,15 +17,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcairo2 \
     libasound2 \
     libxshmfence1 \
+    libxss1 \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-thai-tlwg \
+    fonts-kacst \
+    fonts-freefont-ttf \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-ENV PUPPETEER_SKIP_DOWNLOAD=true
+# Do NOT set PUPPETEER_SKIP_DOWNLOAD - let Puppeteer download its own Chromium
+# Do NOT set PUPPETEER_EXECUTABLE_PATH - Puppeteer will find its own binary
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+# Use npm ci without --omit=dev to ensure puppeteer's postinstall runs (downloads Chromium)
+RUN npm ci
 
 COPY . .
 
